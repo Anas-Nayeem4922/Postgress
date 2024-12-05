@@ -1,4 +1,4 @@
-const connection = "postgresql://neondb_owner:XnZpmFI4kzR1@ep-green-sea-a57t31yn.us-east-2.aws.neon.tech/neondb?sslmode=require";
+
 
 import { Client } from "pg";
 import express from "express";
