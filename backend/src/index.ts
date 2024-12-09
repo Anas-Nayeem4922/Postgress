@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 import { auth } from "./middleware";
 const JWT_SECRET = process.env.JWT_SECRET;
 app.use(express.json());
+import cors from "cors";
+app.use(cors());
 const port = 8080;
 
 
