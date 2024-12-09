@@ -1,15 +1,19 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton";
 import { BACKEND_URL } from "@/config";
+import { DeleteIcon } from "@/icons/Delete";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react"
 
 const DashBoard = () => {
     interface Todo {
         title : string,
-        done : boolean
+        done : boolean,
+        id : number
     }
     const [todos, setTodos] = useState<Todo[]>([]);
+    const [loading, setLoading] = useState(false);
     async function getTodos() {
         const response = await axios.get(`${BACKEND_URL}/user/todo`, {
             headers : {
@@ -35,10 +39,10 @@ const DashBoard = () => {
                                 "token" : localStorage.getItem("token")
                             }
                         })
-                        console.log(response.data);
                         const todoObj = {
                             title : response.data.todo.title,
-                            done : false
+                            done : response.data.todo.done,
+                            id : response.data.todo.id
                         }
                         setTodos((prev) => ([...prev, todoObj]));
                         if(inputRef.current) {
@@ -47,10 +51,20 @@ const DashBoard = () => {
                     }}>Add</Button></div>
                 </div>
                 <div className="flex flex-col justify-center">
-                    {todos.map((todo : {title : string, done : boolean}, idx) => {
-                        return <div key={idx} className="bg-slate-300 rounded-md px-4 py-2 m-2 mx-0">
-                            <p>{idx + 1}. {todo.title}</p>
-                        </div>
+                    {todos.map((todo : Todo, idx) => {
+                        return !loading ? <div key={idx} className="bg-slate-300 rounded-md px-4 py-2 m-2 mx-0 flex justify-between">
+                        <p>{idx + 1}. {todo.title}</p>
+                        <div onClick={async() => {
+                            setLoading(true);
+                            await axios.delete(`${BACKEND_URL}/user/todo/${todo.id}`, {
+                                headers : {
+                                    "token" : localStorage.getItem("token")
+                                }
+                            })
+                            setTodos((prev) => prev.filter((t) => t.id !== todo.id));
+                            setLoading(false);
+                        }}><DeleteIcon/></div>
+                    </div> : <div key={idx}><Skeleton className="h-10 w-full m-2"/></div>
                     })}
                 </div>
             </div>
