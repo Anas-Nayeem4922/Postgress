@@ -16,9 +16,9 @@ const port = 8080;
 // Signup
 app.post("/signup", async(req, res) => {
     const userSchema = z.object({
-        username : z.string().min(3).max(10),
+        username : z.string().min(3),
         email : z.string().email(),
-        password : z.string().min(3).max(10)
+        password : z.string().min(3)
     })
     const {success, error} = userSchema.safeParse(req.body);
     if(success) {
@@ -99,13 +99,14 @@ app.post("/user/todo", auth, async(req : Request, res) => {
     const {success, error} = todoSchema.safeParse(req.body);
     const title = req.body.title;
     if(success) {
-        await client.todo.create({
+        const todo = await client.todo.create({
             data : {
                 title,
                 userId : parseInt(req.userId as string) 
             }
         })
         res.json({
+            todo,
             msg : "Todo added successfully"
         })
     }else{
